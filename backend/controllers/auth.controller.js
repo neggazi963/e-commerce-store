@@ -70,5 +70,19 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  res.json({ message: "Logout successful" });
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (refreshToken) {
+      const decoded = jwt.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET,
+      );
+      await redis.del(`refresh_token :${decoded.userId}`);
+      res.clearCookie("refreshToken");
+      res.status(200).json({ message: "Logout successful" });
+    }
+  } catch (error) {
+    console.log("Error in logout controller", error.message);
+    res.status(500).json({ message: "Logout failed", error: error.message });
+  }
 };
