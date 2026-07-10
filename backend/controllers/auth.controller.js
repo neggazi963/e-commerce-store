@@ -148,19 +148,11 @@ export const refreshToken = async (req, res) => {
   }
 };
 
-
 export const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
-    res.status(200).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    });
+    res.json(req.user);
   } catch (error) {
     console.log("Error in get profile controller", error.message);
     res.status(500).json({ message: error.message });
   }
-}
-
+};
