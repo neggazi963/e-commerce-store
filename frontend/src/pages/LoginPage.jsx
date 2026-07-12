@@ -2,27 +2,20 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { LogIn, Mail, Lock, ArrowRight, Loader } from "lucide-react";
+import { useUserStore } from "../stores/useUserStore";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const loading = false;
+
+  const { login, loading } = useUserStore();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(email, password);
+    login({ email, password });
   };
   return (
     <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <motion.div
-        className="sm:mx-auto sm:w-full sm:max-w-md"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-emerald-400">
-          Create your account
-        </h2>
-      </motion.div>
 
       <motion.div
         className="mt-8 sm:mx-auto sm:w-full sm:max-w-md"
