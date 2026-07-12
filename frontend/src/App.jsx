@@ -3,18 +3,20 @@ import HomePage from "./pages/HomePage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import SignUpPage from "./pages/SignUpPage.jsx";
 import Navbar from "./components/Navbar.jsx";
+import AdminPage from "./pages/AdminPage.jsx";
 import { Toaster } from "react-hot-toast";
 import { useUserStore } from "./stores/useUserStore.js";
 import { useEffect } from "react";
 import LoadingSpinner from "./components/LoadingSpinner.jsx";
 
+
 function App() {
-  const { user, checkAuth , checkingAuth } = useUserStore();
+  const { user, checkAuth, checkingAuth } = useUserStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
-  if(checkingAuth) return <LoadingSpinner />
+  if (checkingAuth) return <LoadingSpinner />;
   return (
     <div className="min-h-screen bg-gray-900 text-white relative overflow-hidden">
       {/* Background gradient */}
@@ -28,10 +30,17 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/signup" element={!user ? <SignUpPage /> : <Navigate to="/" />} />
+          <Route
+            path="/signup"
+            element={!user ? <SignUpPage /> : <Navigate to="/" />}
+          />
           <Route
             path="/login"
             element={!user ? <LoginPage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/secret-dashboard"
+            element={user?.role === "admin" ? <AdminPage /> : <Navigate to="/login" />}
           />
         </Routes>
       </div>
