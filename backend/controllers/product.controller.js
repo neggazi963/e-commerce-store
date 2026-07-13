@@ -1,6 +1,7 @@
 import { redis } from "../lib/redis.js";
 import Product from "../models/product.model.js";
 import cloudinary from "../lib/cloudinary.js";
+
 export const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find({});
@@ -18,7 +19,7 @@ export const getFeaturedProducts = async (req, res) => {
       return res.json(JSON.parse(featuredProducts));
     }
 
-    featuredProducts = await Product.find({ featured: true }).lean();
+    featuredProducts = await Product.find({ isFeatured: true }).lean();
 
     if (!featuredProducts) {
       return res.status(404).json({ message: "No featured products found" });
@@ -26,9 +27,9 @@ export const getFeaturedProducts = async (req, res) => {
 
     await redis.set("featured_products", JSON.stringify(featuredProducts));
 
-    res.json({ featuredProducts });
+    res.json(featuredProducts);
   } catch (error) {
-    console.log("Error in get all products controller", error.message);
+    console.log("Error in get featured products controller", error.message);
     res.status(500).json({ message: error.message });
   }
 };
@@ -68,10 +69,10 @@ export const deleteProduct = async (req, res) => {
     if (product.image) {
       const publicId = product.image.split("/").pop().split(".")[0];
       try {
-        await cloudinary.uploader.destroy(`products/${publicId} `);
+        await cloudinary.uploader.destroy(`products/${publicId}`);
       } catch (error) {
         console.log("Error in delete product from cloudinary", error.message);
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
       }
     }
     await Product.findByIdAndDelete(req.params.id);
@@ -125,7 +126,7 @@ export const toggleFeaturedProduct = async (req, res) => {
 
 async function updateFeaturedProductsCache() {
   try {
-    const featuredProducts = await Product.find({ featured: true }).lean();
+    const featuredProducts = await Product.find({ isFeatured: true }).lean();
     await redis.set("featured_products", JSON.stringify(featuredProducts));
   } catch (error) {
     console.log("Error in update featured products cache", error.message);

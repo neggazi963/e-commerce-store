@@ -2,24 +2,25 @@ import User from "../models/user.model.js";
 import Product from "../models/product.model.js";
 import Order from "../models/order.model.js";
 
-export const getAnalyticsData = async (req, res) => {
+export const getAnalyticsData = async () => {
   const totalUsers = await User.countDocuments();
   const totalProducts = await Product.countDocuments();
 
-  const selesData = await Order.aggregate([
+  const salesData = await Order.aggregate([
     {
       $group: {
-        _id: null, // it group all documents together
+        _id: null,
         totalSales: { $sum: 1 },
         totalRevenue: { $sum: "$totalAmount" },
       },
     },
   ]);
 
-  const { totalSales, totalRevenue } = selesData[0] || {
+  const { totalSales, totalRevenue } = salesData[0] || {
     totalSales: 0,
     totalRevenue: 0,
   };
+
   return {
     users: totalUsers,
     products: totalProducts,
@@ -43,17 +44,13 @@ export const getDailysalesData = async (startDate, endDate) => {
           revenue: { $sum: "$totalAmount" },
         },
       },
-      {
-        $sort: {
-          _id: 1,
-        },
-      },
+      { $sort: { _id: 1 } },
     ]);
+
     const dateArray = getDatesInRange(startDate, endDate);
 
     return dateArray.map((date) => {
-      const foundData = getDailysalesData.find((item) => item._id === date);
-
+      const foundData = dailySales.find((item) => item._id === date);
       return {
         date,
         sales: foundData?.sales || 0,
@@ -71,7 +68,7 @@ function getDatesInRange(startDate, endDate) {
 
   while (currentDate <= endDate) {
     dates.push(currentDate.toISOString().split("T")[0]);
-    currentDate = new Date(currentDate.getTime() + 1);
+    currentDate.setDate(currentDate.getDate() + 1);
   }
   return dates;
 }
