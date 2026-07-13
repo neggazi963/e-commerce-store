@@ -4,10 +4,12 @@ import LoginPage from "./pages/LoginPage.jsx";
 import SignUpPage from "./pages/SignUpPage.jsx";
 import Navbar from "./components/Navbar.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
+import CategoryPage from "./pages/CategoryPage.jsx";
 import { Toaster } from "react-hot-toast";
 import { useUserStore } from "./stores/useUserStore.js";
 import { useEffect } from "react";
 import LoadingSpinner from "./components/LoadingSpinner.jsx";
+
 
 
 function App() {
@@ -41,6 +43,10 @@ function App() {
           <Route
             path="/secret-dashboard"
             element={user?.role === "admin" ? <AdminPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/category/:category"
+            element={<CategoryPage/>}
           />
         </Routes>
       </div>
